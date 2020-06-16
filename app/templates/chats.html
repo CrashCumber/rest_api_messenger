@@ -3,31 +3,41 @@
 {% block content %}
     <div class="container-fluid">
 
-    <a href="/create_chat/{{user_id}}" class="btn btn-primary my-2">Create chat</a>
+    <div class="btn-group">
+        <a href="/create_chat" class="btn btn-primary my-2">Create chat</a>
 
+        <a href="/profile" class="btn btn-primary my-2">Profile</a>
 
-    <a href="/" class="btn btn-primary my-2">Profile</a>
-    <a href="/" class="btn btn-primary my-2">Logout</a>
+        <a href="/logout" class="btn btn-primary my-2">Logout</a>
+    </div>
+
         {%  for chat in chats %}
         <a class="container-fluid" href="/chat/{{ chat.id }}" style="">
-        <div class="card">
-            <svg class="bd-placeholder-img card-img-top" width="100%" height="100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail">
-                <title>{{ chat.title }}</title>
-                <rect fill="#55595c" width="100%" height="100%"></rect>
-                <text fill="#eceeef" dy=".3em" x="50%" y="50%">{{ chat.title }}</text>
-            </svg>
-            <div class="card-body">
-              <p class="card-text">{{ chat.last_message }} </p>
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="btn-group">
-                  <button type="button" class="btn btn-sm btn-outline-secondary">Left</button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary">Delete</button>
+            <div class="card">
+
+                <svg class="bd-placeholder-img card-img-top" width="100%" height="100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img" aria-label="Placeholder: Thumbnail">
+                    <title>{{ chat.title }}</title>
+                    <rect fill="#55595c" width="100%" height="100%"></rect>
+                    <text fill="#eceeef" dy=".3em" x="50%" y="50%">{{ chat.title }}</text>
+                </svg>
+
+                <div class="card-body">
+
+                    <p class="card-text">{{ chat.last_message }} </p>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="btn-group">
+                          <button type="button" class="btn btn-sm btn-outline-secondary">Left</button>
+                          <button type="button" class="btn btn-sm btn-outline-secondary">Delete</button>
+                        </div>
+                        <small class="text-muted">{{ chat.last_message_time }}</small>
+                    </div>
+
                 </div>
-                <small class="text-muted">{{ chat.last_message_time }}</small>
-              </div>
+
             </div>
-          </div>
         </a>
         {% endfor %}
+
     </div>
 {% endblock %}

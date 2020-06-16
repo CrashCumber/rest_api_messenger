@@ -2,22 +2,40 @@
 
 {% block content %}
 
-<form method="post" >
+<form action="/login" method="post" >
+    {{ form.csrf_token }}
 
     <br>
-    <h4 class="mb-3">User</h4>
+
+    <h4 class="mb-3">Login</h4>
+
+    {% if error_msg %}
+        <div class="mb-1">
+            {{ error_msg }}
+        </div>
+    {% endif %}
 
     <div class="mb-3">
         <div class="input-group">
             <div class="input-group-prepend">
-            <span class="input-group-text"> >> </span>
+                <span class="input-group-text"> >> </span>
             </div>
             <input type="text" class="form-control"  id="name" placeholder="Username" name="name" required="">
         </div>
     </div>
 
+    <div class="mb-3">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text"> >> </span>
+            </div>
+            <input type="text" class="form-control"  id="password" placeholder="Password" name="password" required="">
+        </div>
+    </div>
+
     <hr class="mb-4">
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to create</button>
+    <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+    <a href="/registration" class="btn btn-primary btn-lg btn-block" type="submit">Create account</a>
 
 </form>
 {% endblock %}

@@ -3,15 +3,18 @@ from wtforms import StringField, SubmitField, TextAreaField, IntegerField, valid
 
 
 class RegForm(FlaskForm):
-    name = StringField('Username', [validators.Length(min=4, max=25), validators.DataRequired()])
-    email = StringField('Email', validators=[validators.Email()])
-    password = PasswordField('New Password', [validators.DataRequired()])
+    name = StringField([validators.Length(min=4, max=25), validators.DataRequired()])
+    email = StringField([validators.Email(), validators.DataRequired()])
+    password = PasswordField([validators.DataRequired()])
 
-class LogForm(FlaskForm):
-    name = StringField('Username', [validators.Length(min=4, max=25), validators.DataRequired()])
+
+class LoginForm(FlaskForm):
+    name = StringField([validators.Length(min=4, max=25), validators.InputRequired()])
+    password = PasswordField([validators. InputRequired()])
+
 
 class ChatForm(FlaskForm):
-    tittle_chat = StringField('Title')
+    tittle_chat = StringField([validators.InputRequired()])
 
 
 class SendMessageForm(FlaskForm):

@@ -4,9 +4,16 @@
 {% block content %}
 
 <form method="post" >
+    {{ form.csrf_token }}
 
     <br>
     <h4 class="mb-3">New user</h4>
+
+    {% if error_msg %}
+        <div class="mb-1">
+            {{ error_msg }}
+        </div>
+    {% endif %}
 
     <div class="mb-3">
         <div class="input-group">
@@ -42,6 +49,7 @@
     <hr class="mb-4">
 
     <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to create</button>
+    <a href="/login" class="btn btn-primary btn-lg btn-block">Login</a>
 
 </form>
 {% endblock %}
