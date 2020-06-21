@@ -1,6 +1,6 @@
 import datetime
 from functools import wraps
-from flask import request, render_template, redirect, make_response, session
+from flask import request, render_template, redirect, make_response, session, abort
 from jinja2 import Template
 
 from app import app, db
@@ -11,37 +11,60 @@ from app.models import User, Chat, Message
 
 def is_auth(func):
     @wraps(func)
-    def wrapper():
+    def wrapper(*args, **kwargs):
         if not session.get('is_auth', False):
             return redirect('/login')
 
-        return func()
+        return func(*args, **kwargs)
     return wrapper
 
 
 @app.route('/registration', methods=["POST", "GET"])
 def registration():
     form = RegForm()
+
+    token = str(form.csrf_token).split(' ')
+    token = token[-1]
+    token = token[7:len(token) - 2]
+
+    if request.method == 'GET':
+        session["csrf_token"] = token
+        response = make_response(' ')
+        response.headers["X-CSRF-Token"] = token
+        return response
+
+    if request.content_type != 'application/x-www-form-urlencoded':
+        abort(400)
+
     error_msg = False
 
-    if form.validate_on_submit():
+    if form.csrf_token.data == token:
 
-        data = {"name": form.name.data, "email": form.email.data, "password": form.password.data}
+        if form.validate_on_submit():
 
-        if not User.query.filter(User.name == data["name"]).first():
-            user = User(**data)
+            data = {"name": form.name.data, "email": form.email.data, "password": form.password.data}
 
-            db.session.add(user)
-            db.session.commit()
+            if not User.query.filter(User.name == data["name"]).first():
+                user = User(**data)
 
-            session["is_auth"] = True
-            session["username"] = data["name"]
-            session["user_id"] = user.id
+                db.session.add(user)
+                db.session.commit()
 
-            return redirect(f'/chats')
-        error_msg = 'User already exist'
+                session["is_auth"] = True
+                session["username"] = data["name"]
+                session["user_id"] = user.id
 
-    return render_template('create_user.html', form=form, title="registration", error_msg=error_msg)
+                response = make_response('', 302)
+                response.headers["Location"] = "http://127.0.0.1:5000/chats"
+                response.headers["X-CSRF-Token"] = session["csrf_token"]
+
+                return response
+
+            error_msg = 'User already exist'
+            response = make_response(error_msg)
+            return response
+
+    abort(500)
 
 
 @app.route('/login', methods=["POST", "GET"])
@@ -50,23 +73,48 @@ def login():
         return redirect("/")
 
     form = LoginForm()
+
+    token = str(form.csrf_token).split(' ')
+    token = token[-1]
+    token = token[7:len(token)-2]
+
+    if request.method == 'GET':
+        session["csrf_token"] = token
+        response = make_response(' ')
+        response.headers["X-CSRF-Token"] = token
+        return response
+
+    if request.content_type != 'application/x-www-form-urlencoded':
+        abort(400)
+
     error_msg = False
+    form.csrf_token.data = token
 
-    if form.validate_on_submit():
-        username = form.name.data
-        password = form.password.data
+    if form.csrf_token.data == token:
 
-        user = User.query.filter(User.name == username and User.password == password).first()
+        if form.validate_on_submit():
+            username = form.name.data
+            password = form.password.data
 
-        if user:
-            session["is_auth"] = True
-            session["username"] = username
-            session["user_id"] = user.id
-            return redirect(f'/chats')
-        else:
-            error_msg = 'Wrong password or username'
+            user = User.query.filter(User.name == username).filter(User.password == password).first()
 
-    return render_template('login.html', form=form, title="login", error_msg=error_msg)
+            if user:
+                session["is_auth"] = True
+                session["username"] = username
+                session["user_id"] = user.id
+
+                response = make_response('', 302)
+                response.headers["Location"] = "http://127.0.0.1:5000/chats"
+                response.headers["X-CSRF-Token"] = session["csrf_token"]
+
+                return response
+            else:
+                error_msg = 'Wrong password or username'
+                response = make_response(error_msg)
+
+                return response
+    abort(500)
+    # return render_template('login.html', form=form, title="login", error_msg=error_msg)
 
 
 @app.route('/logout')
@@ -74,8 +122,12 @@ def logout():
     session["is_auth"] = False
     session.pop("username")
     session.pop("user_id")
+    session.pop("csrf_token")
 
-    return redirect(f'/login')
+    response = make_response('', 302)
+    response.headers["Location"] = "http://127.0.0.1:5000/login"
+
+    return response
 
 
 @app.route('/')
@@ -84,58 +136,91 @@ def home():
     return 'Home'
 
 
-@app.route('/chats', methods=["POST", "GET"])
+@app.route('/chats', methods=["GET"])
 @is_auth
 def chats():
-    user = User.query.get(session["user_id"])
+    if request.headers["X-CSRF-Token"] == session["csrf_token"]:
+        user = User.query.get(session["user_id"])
+        body = []
 
-    return render_template('chats.html', chats=user.chats, title="chats")
+        for chat in user.chats:
+            data = {"id": chat.id,
+                    "title": chat.title,
+                    "last_message": chat.last_message,
+                    "last_message_time": chat.last_message_time,
+                    "sender_id": chat.sender_id
+                    }
+            body.append(data)
+
+        response = make_response({"chats":body})
+        return response
+
+    abort(403)
 
 
 @app.route('/create_chat', methods=["POST", "GET"])
 @is_auth
 def create_chat():
-    form = ChatForm()
-    error_msg = False
+    if request.headers["X-CSRF-Token"] == session["csrf_token"]:
+        form = ChatForm()
+        error_msg = False
 
-    if form.validate_on_submit():
+        if request.method == 'POST':
 
-        data = form.tittle_chat.data
-        chat_ = Chat(title=data)
+            data = form.tittle_chat.data
+            chat_ = Chat(title=data)
 
-        db.session.add(chat_)
-        db.session.commit()
+            db.session.add(chat_)
+            db.session.commit()
 
-        user = User.query.get(session["user_id"])
-        user.chats.append(chat_)
-        db.session.commit()
+            user = User.query.get(session["user_id"])
+            user.chats.append(chat_)
+            db.session.commit()
 
-        return redirect(f'/chat/{chat_.id}')
+            response = make_response('', 302)
+            response.headers["Location"] = f"http://127.0.0.1:5000/chat/{chat_.id}"
 
-    return render_template('create_chat.html', form=form, title="create_chat", error_msg=error_msg)
+            return response
+
+    abort(403)
 
 
 @app.route('/chat/<chat_id>', methods=["POST", "GET"])
 @is_auth
 def chat(chat_id: int):
-    chat = Chat.query.get(chat_id)
+    if request.headers["X-CSRF-Token"] == session["csrf_token"]:
 
-    form = SendMessageForm()
-    sender = User.query.get(session["user_id"])
+        if request.method == 'GET':
+            chat_messages = Message.query.filter(Message.chat_id == chat_id).all()
+            body = []
+            for mes in chat_messages:
+                data = {"id": mes.id,
+                        "content": mes.content,
+                        "sender_id": mes.sender_id,
+                        "time": mes.time
+                        }
+                body.append(data)
 
-    if form.validate_on_submit():
+            response = make_response({"messages": body})
+            return response
 
-        data = form.content.data
+        if request.method == "POST":
 
-        message = Message(content=data, chat_id=chat_id, sender_id=sender.id)
-        chat.last_message = data
-        chat.last_message_time = datetime.datetime.now()
+            form = SendMessageForm()
 
-        db.session.add(message, chat)
-        db.session.commit()
+            sender = User.query.get(session["user_id"])
+            data = form.content.data
 
-    chat_messages = Message.query.filter(Message.chat_id == chat_id).all()
+            message = Message(content=data, chat_id=chat_id, sender_id=sender.id)
 
-    return render_template('chat.html', form=form, title=chat.title, messages=chat_messages)
+            chat = Chat.query.get(chat_id)
+            chat.last_message = data
+            chat.last_message_time = datetime.datetime.now()
+
+            db.session.add(message, chat)
+            db.session.commit()
+    abort(403)
+
+
 
 

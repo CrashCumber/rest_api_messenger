@@ -19,3 +19,4 @@ class ChatForm(FlaskForm):
 
 class SendMessageForm(FlaskForm):
     content = TextAreaField('Message')
+
