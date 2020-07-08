@@ -12,21 +12,22 @@ class Test():
     def test_login(self):
         location = self.url + '/token'
         response = requests.get(location)
+        token = response.cookies.get("access_token")
+        cookies_jar = requests.cookies.RequestsCookieJar()
+        cookies_jar.set('access_token', token)
+        print(response.cookies, type(response.cookies))
+        headers = {'Content-Type': "application/x-www-form-urlencoded"}
+        body = {"name": "valentina", "password": "v"}
+        location = self.url + '/login'
+        print(cookies_jar)
 
-        headers = {'Content-Type': "application/x-www-form-urlencoded", "X-CSRF-Token": response.headers["X-CSRF-Token"]}
-        # body = {"name": "valentina", "password": "v"}
-        body = {"name": "frhhhefefhui", "password": "v", 'email': 'nsdb@nfdfvn.ru'}
-
-        location = self.url + '/registration'
-
-        response = requests.post(headers=headers,  data=body, url=location)
-        print(response.headers)
+        response = requests.post(headers=headers,  data=body, url=location, cookies=cookies_jar)
+        cookies_jar.set('user_id', response.cookies.get("user_id"))
 
         location = response.headers["Location"]
-        headers = response.headers
 
-        response = requests.get(url=location, headers=headers)
-        print(response.json())
+        response = requests.get(url=location, cookies=cookies_jar)
+        print(response.content, cookies_jar)
 
 
 

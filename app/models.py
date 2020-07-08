@@ -17,8 +17,9 @@ class User(db.Model):
     messages = db.relationship('Message', backref='user', lazy=True)
     chats = db.relationship('Chat', secondary=association, back_populates="users")
     token = db.Column(db.String(255), nullable=True)
+
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return f'<User {self.name}'
 
 
 class Chat(db.Model):
@@ -31,6 +32,9 @@ class Chat(db.Model):
     sender_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     users = db.relationship("User", secondary=association, back_populates="chats")
 
+    def __repr__(self):
+        return f'<Chat {self.title}'
+
 
 class Message(db.Model):
     __tablename__ = 'messages'
@@ -39,3 +43,6 @@ class Message(db.Model):
     chat_id = db.Column(db.Integer(), db.ForeignKey('chats.id'))
     time = db.Column(db.DateTime(), default=datetime.utcnow)
     content = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<Message {self.content}'
