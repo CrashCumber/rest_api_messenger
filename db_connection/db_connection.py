@@ -30,16 +30,18 @@ class DbClient:
         if not user:
             cursor.close()
             return None
-        cursor.close()
+
         # if time:
         #     time = user[6].strftime('%Y-%d-%m %H:%M:%S')
         data = {
                 "id": user[0],
                 "name": user[1],
-                "password": user[2],
-                "email": user[3],
+                "password": user[3],
+                "email": user[2],
                 "token": user[4],
                 }
+        print(user)
+        cursor.close()
         return data
 
     def update_user(self, data):
@@ -52,15 +54,17 @@ class DbClient:
     def insert_user(self, data):
         cursor = self.connection.cursor()
         insert = f"""
-                       INSERT INTO `users` (
+                       INSERT INTO users (
                         `name`,
                         `password`,
                         `email`,
-                        )
+                        `token`
+                       )
                         VALUES (
                         '{data["name"]}',
                         '{data["password"]}',
                         '{data["email"]}',
+                        NULL
                         );
                    """
         cursor.execute(insert)
