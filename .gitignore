@@ -2,5 +2,9 @@ migrations/*
 venv/*
 __pycache__/*
 .idea/
-
+app/static
+app/templates
+db_connection/
+test_api/
+conftest.py
 
