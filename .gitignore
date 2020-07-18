@@ -1,6 +1,9 @@
 migrations/*
 venv/*
 __pycache__/
+__pycache__/**
+**/__pycache__/**
+
 .idea/
 app/static
 app/templates
