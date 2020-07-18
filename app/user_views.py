@@ -104,7 +104,7 @@ def post_user():
         db.session.commit()
 
         response = make_response({"status": "ok"}, 201)
-        response.headers["Location"] = URL + "api/chats"
+        response.headers["Location"] = URL + "/api/chats"
         response.set_cookie('user_id', str(user.id))
         response.set_cookie('access_token', user.token)
         return response

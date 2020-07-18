@@ -6,11 +6,11 @@ from sqlalchemy import null
 from faker import Faker
 fake = Faker()
 from db_connection.db_connection import DbClient
+from app.models import *
 
-
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def config():
-    url = 'http://127.0.0.1:5000'
+    url = 'http://127.0.0.1:5000/api'
     db = DbClient()
     return db, url
 
@@ -37,7 +37,8 @@ def new_user(config):
     yield data
 
     db, url = config
-    db.delete_user(name)
+    user = User.query.filter(User.name == data["name"]).first()
+    print(user)
 
 
 @pytest.fixture()
@@ -53,15 +54,5 @@ def reg_user(config):
     data = db.get_user(name)
 
     yield data
-    headers = {'Content-Type': "application/x-www-form-urlencoded"}
-    body = {"name": name, "password": password}
-    # body = {"name": 'valentina', "password": 'v'}
-
-    location = url + '/login'
-    sleep(10)
-    response = requests.post(headers=headers, data=body, url=location)
-    sleep(10)
     data = db.get_user(name)
-
-
     # db.delete_user(name)
