@@ -7,4 +7,6 @@ app/templates
 db_connection/
 test_api/
 conftest.py
+.DS_Store/
+
 
