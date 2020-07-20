@@ -1,7 +1,7 @@
-from flask import request, make_response, abort
+from flask import request, make_response, abort, session, redirect
 import random
-from app import app, db, URL
-from app.forms import LoginForm, RegForm
+from app import app, db
+from app.forms import LoginForm
 from app.models import User
 from functools import wraps
 
@@ -32,9 +32,19 @@ def get_token():
     return token
 
 
+@app.route('/', methods=["GET"])
+def main():
+    response = make_response({"status": "ok"}, 200)
+
+    return response
+
+
 @app.route('/api/login', methods=["POST"])
 def post_login():
-    form = LoginForm(csrf_enabled=False)
+    """
+    Login user
+    """
+    form = LoginForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'
@@ -56,7 +66,7 @@ def post_login():
         db.session.commit()
 
         response = make_response({"status": "ok"}, 200)
-        response.headers["Location"] = URL + "/api/chats"
+        response.headers["Location"] = f"http://{request.host}/api/chats"
         response.set_cookie('user_id', str(user.id))
         response.set_cookie('access_token', user.token)
 
@@ -70,13 +80,17 @@ def post_login():
 @app.route('/api/logout', methods=["GET"])
 @is_auth
 def logout():
+    """
+    logout user
+    :return:
+    """
     user_id = request.cookies.get('user_id', False)
     user = User.query.get(user_id)
 
     user.token = None
 
     response = make_response({"status": "ok"}, 200)
-    response.headers["Location"] = URL + "/api/login"
+    response.headers["Location"] = f"http://{request.host}/api/login"
     response.set_cookie('access_token', ' ', max_age=0)
     response.set_cookie('user_id', ' ', max_age=0)
     return response

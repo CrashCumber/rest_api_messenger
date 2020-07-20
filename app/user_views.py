@@ -1,5 +1,5 @@
 from flask import request, make_response, abort
-from app import app, db, URL
+from app import app, db
 from app.auth_views import is_auth, get_token
 from app.models import User
 from app.forms import UserForm, RegForm
@@ -35,7 +35,7 @@ def put_user():
     """
     User is modified
     """
-    form = UserForm(csrf_enabled=False)
+    form = UserForm()
 
     user_id = request.cookies.get('user_id')
     user = User.query.get(user_id)
@@ -81,7 +81,7 @@ def post_user():
     """
     User is created and authorized
     """
-    form = RegForm(csrf_enabled=False)
+    form = RegForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'
@@ -104,7 +104,7 @@ def post_user():
         db.session.commit()
 
         response = make_response({"status": "ok"}, 201)
-        response.headers["Location"] = URL + "/api/chats"
+        response.headers["Location"] = f"http://{request.host}/api/chats"
         response.set_cookie('user_id', str(user.id))
         response.set_cookie('access_token', user.token)
         return response
@@ -130,32 +130,3 @@ def delete_user():
     response.set_cookie('access_token', ' ', max_age=0)
     response.set_cookie('user_id', ' ', max_age=0)
     return response
-
-#
-# @app.route('/api/user', methods=["POST"])
-# @is_auth
-# def post_user():
-#     user_id = request.cookies.get('user_id')
-#     sender = User.query.get(user_id)
-#
-#     search_name = request.args.get('username')
-#     search_user = User.query.filter(User.name == search_name).first()
-#
-#     chat = Chat.query.filter(title=f"{search_name},{sender.name}").first() | Chat.query.filter(title=f"{sender.name},{search_name}").first()
-#
-#     if chat is None:
-#         chat_ = Chat(title=f"{search_name},{sender.name}")
-#         db.session.add(chat_)
-#         db.session.commit()
-#
-#         sender.chats.append(chat_)
-#         search_user.chats.append(chat_)
-#
-#         db.session.commit(search_user, sender)
-#         db.session.commit()
-#
-#     response = make_response('', 200)
-#     response.headers["Location"] = f"http://127.0.0.1:5000/chats/{chat_.id}"
-#
-#     return response
-

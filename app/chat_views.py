@@ -1,6 +1,6 @@
 import datetime
 from flask import request, make_response
-from app import app, db, URL
+from app import app, db
 from app.auth_views import is_auth
 from app.forms import ChatForm, MessageForm
 from app.models import User, Chat, Message
@@ -35,7 +35,7 @@ def post_chats():
     """
     Create chat
     """
-    form = ChatForm(csrf_enabled=False)
+    form = ChatForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'
@@ -60,7 +60,7 @@ def post_chats():
     db.session.commit()
 
     response = make_response({"status": "ok"}, 201)
-    response.headers["Location"] = f"{URL}/chats/{chat_.id}"
+    response.headers["Location"] = f"http://{request.host}/api/chats/{chat_.id}"
 
     return response
 
@@ -134,7 +134,7 @@ def post_chat(chat_id: int):
         response = make_response({"error": error_msg}, 403)
         return response
 
-    form = MessageForm(csrf_enabled=False)
+    form = MessageForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'

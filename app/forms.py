@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, IntegerField, validators, BooleanField, PasswordField
+from wtforms import StringField, TextAreaField, validators, PasswordField
 
 
 class RegForm(FlaskForm):

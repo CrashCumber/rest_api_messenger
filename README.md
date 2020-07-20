@@ -1,356 +1,67 @@
-When user has autorized or registered he gets a token that he must provides in each request to server.
-
-## Authorization 
-#### REQUEST
-```
-POST /api/login
-
-Content-type: application/x-www-form-urlencoded
-
-Body:
-name: {name}
-password: {password}
-```
-#### RESPONSE
-###### VALID
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-Location: /api/chats
-
-Cookies:
-user_id={id}
-token={...}
-```
-###### INVALID
-
-```
-Status: 400
-
-Content-type: application/json
-
-Body:
-{"error": "{description of error}"}
-
-```
-
-
-## Deauthorization 
-It is required access\_token and user\_id in request cookies.
-#### REQUEST 
-```
-GET /api/logout
-
-```
-#### RESPONSE
-###### VALID
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-Location: /api/login
-
-Cookies:
-user_id={' '}
-token={' '}
-```
-
-## Chats
-### /api/chats
-
-It is required access\_token and user\_id in request cookies.
-#### REQUESTS
-
-* `GET` get user`s chats
-
-* `POST ` create chat
-
-```
-Content-type: application/x-www-form-urlencoded
-
-Body:	title: {title}
-```
-
-* `DELETE` delete user from chat 
-
-```
-Params : chat_id={chat_id}
-
-```
-#### RESPONSES
-###### VALID 
-* `GET`
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body:
-{
-  "chats": [
-    {
-      "id": {id},
-      "last_message": {last_message},
-      "last_message_time": {last_message},
-      "sender_id": {sender_id},
-      "title": {title}
-    },
-    ...
-    ]
-}
-
-```
-
-*  `POST`
-
-```
-Status: 201
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-*  `DELETE`
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-###### INVALID 
-
-```
-Status: 400/404/403
-
-Content-type: application/json
-
-Body:
-{"error": "{description of error}"}
-
-```
-
-## Chat 
-
-### /api/chats/{chat_id}
-It is required access\_token and user\_id in request cookies.
-#### REQUESTS
-
-* `GET` get chat`s messages
-
-* `POST ` send message in chat (only authorized user with access to chat)
-
-```
-Content-type: application/x-www-form-urlencoded
-
-Body:	content: {content}
-```
-
-* ` PUT ` change chat title (only authorized user with access to chat)
-
-```
-Content-type: application/x-www-form-urlencoded
-
-Body:	title: {title}
-```
-
-* `DELETE` delete user`s messege (only authorized user`s messages)
-
-```
-Params : id={mes_id}
-
-```
-
-
-#### RESPONSES
-###### VALID 
-* `GET`
-
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body:
-{
-  "messages": [
-    {
-      "content": {content},
-      "id": {id},
-      "sender_id": {sender_id},
-      "time": {time}
-    },
-     ...
-    ]
-}
-
-```
-
-*  `POST`
-
-```
-Status: 201
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-*  `PUT`
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-*  `DELETE`
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-###### INVALID 
-
-```
-Status: 400/404/403
-
-Content-type: application/json
-
-Body:
-{"error": "{description of error}"}
-
-
-```
-
-## User
-
-### /api/user/{user_id}
-It is required access\_token and user\_id in request cookies.
-#### REQUESTS
-
-* `GET` get user information
-
-```
-Params : name={name}
-```
-
-* `POST ` create user and auth 
-
-```
-Content-type: application/x-www-form-urlencoded
-
-Body:
-		name: {name}
-		password: {password}
-		email: {email}
-
-```
-
-* ` PUT ` change user information (only authorized)
-
-```
-Content-type: application/x-www-form-urlencoded
-
-Body:
-		name: {name}
-		email: {email}
-
-```
-
-* `DELETE` delete user (only authorized)
-
-#### RESPONSES
-###### VALID 
-* `GET`
-
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body:
-{
-  "user": 
-    {
-      "name": {name},
-      "email": {email}
-    }
-}
-
-```
-
-*  `POST`
-
-```
-Status: 201
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-Location: /api/chats
-
-Cookies:
-user_id={id}
-token={...}
-```
-
-*  `PUT`
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-*  `DELETE`
-
-```
-Status: 200
-
-Content-type: application/json
-
-Body: {"status": "ok"}
-
-```
-
-###### INVALID 
-
-```
-Status: 400/404/403
-
-Content-type: application/json
-
-Body:
-{"error": "{description of error}"}
+# REST API FOR MESSENGER ON FLASK
+
+#### To see all endpoints and structure of api requests read [API_README.md](API_README.md)
+
+<!--### App structure
+
+Files:
+
+* `README.md`
+* `config.py` - This is a config file of this RESTful API Server example.
+* `Dockerfile` - Docker config file which is used to build a Docker image
+  running this RESTful API Server example.
+*
+* `.gitignore` - Lists files and file masks of the files which should not be
+  added to git repository.
+* `auth_views.py, chat_views.py, user_views.py` - functions and its routes.
+* `models.py` - models of database`s tables. 
+* `forms.py` - forms of client`s entry.
+*  `__init__` - creation app, migrate, db, bcrypt objects.
+*  `docker-compose.yml` - File of 
+-->
+## Main dependencies. 
+
+- Python 3+
+- Flask framework
+- SQLAlchemy, flask-sqlalchemy - for Database ORM.
+- Bcrypt - for password hashing.
+- Alembic - for DB migrations.
+- WTForms - for flask form.
+- all dependencies you can see in requirements.txt ...
+
+
+## Build and launch the app
+### Using Docker
+##### The first build
+
+1. You need mysql docker image, for downloading it execute:  
+`docker pull mysql`
+2. Clone the Project 
+3. Build the project with:  
+`docker-compose build`
+4. First launch with:  
+`docker-compose up`
+
+##### To start and stop the app later
+- `docker-compose start`
+- `docker-compose stop`
+
+### From sources
+1. Clone the Project
+2. Setup Environment  
+`pip install pipenv`
+3. Install dependencies  
+`pip install -r requirements.txt`
+4. Initialization database and execution migrations   
+`python manage.py runserver db init`
+`python manage.py runserver db migrate`
+`python manage.py runserver db upgrate`   
+After these commands folder`migrations` will be created. It includes database  migrations and versions (execute `python manage.py runserver db -?` to see all  commands with database)
+5. Run server  
+`python manage.py runserver -h 0.0.0.0 -p 5000`
+
+* You can start the server with different options. To see them execute: `python manage.py runserver -?` 
+
+##### App is accessed on http://0.0.0.0:5000/
 
 
