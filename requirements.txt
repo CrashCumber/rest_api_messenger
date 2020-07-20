@@ -25,7 +25,6 @@ idna==2.9
 importlib-metadata==1.7.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
-locust==1.1.1
 Mako==1.1.2
 MarkupSafe==1.1.1
 more-itertools==8.4.0

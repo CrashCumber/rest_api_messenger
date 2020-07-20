@@ -21,10 +21,8 @@ services:
             - db
         links:
             - db
-        entrypoint: bash -c "sleep 25; python manage.py db migrate; python manage.py db upgrade; python manage.py runserver -h 0.0.0.0 -p 5000 "
+        restart: always
+        entrypoint: bash -c "./wait-for-it.sh db:3306 -t 30  -- python manage.py db migrate; python manage.py db upgrade; python manage.py runserver -h 0.0.0.0 -p 5000"
         command: bash -c "python manage.py runserver -h 0.0.0.0 -p 5000"
-
-
-
 
 
