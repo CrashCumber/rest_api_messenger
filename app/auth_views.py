@@ -41,6 +41,9 @@ def main():
 
 @app.route('/api/login', methods=["POST"])
 def post_login():
+    """
+    Login user
+    """
     form = LoginForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
@@ -77,6 +80,10 @@ def post_login():
 @app.route('/api/logout', methods=["GET"])
 @is_auth
 def logout():
+    """
+    logout user
+    :return:
+    """
     user_id = request.cookies.get('user_id', False)
     user = User.query.get(user_id)
 

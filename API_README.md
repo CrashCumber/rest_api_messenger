@@ -1,5 +1,5 @@
 
-When user has autorized or registered he gets a token that he must provides in each request to server.
+When user has authorized or registered he gets a token that he must provide in each request to server.
 
 ## Authorization 
 #### REQUEST
