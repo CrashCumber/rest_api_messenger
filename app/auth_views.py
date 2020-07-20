@@ -32,9 +32,15 @@ def get_token():
     return token
 
 
+@app.route('/', methods=["GET"])
+def main():
+    response = make_response({"status": "ok"}, 200)
+    return response
+
+
 @app.route('/api/login', methods=["POST"])
 def post_login():
-    form = LoginForm(csrf_enabled=False)
+    form = LoginForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'

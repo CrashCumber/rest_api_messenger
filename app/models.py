@@ -26,7 +26,7 @@ class User(db.Model):
         return check_password_hash(self.password, password)
 
     def __repr__(self):
-        return f'<User {self.name}, pas={self.password}, t={self.token}, chats={self.chats} >'
+        return f'<User {self.name}>'
 
 
 class Chat(db.Model):

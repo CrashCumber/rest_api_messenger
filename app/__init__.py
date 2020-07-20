@@ -8,9 +8,7 @@ from flask_bcrypt import Bcrypt
 import os, config
 
 app = Flask(__name__)
-app.config.from_object(os.environ.get('FLASK_ENV') or 'config.DevelopmentConfig')
-
-# инициализирует расширения
+app.config.from_object('config.DevelopmentConfig')
 db = SQLAlchemy(app)
 db.init_app(app)
 
@@ -18,8 +16,7 @@ migrate = Migrate(app, db)
 
 bcrypt = Bcrypt(app)
 
-URL = "http://127.0.0.1:5000"
+URL = "http://0.0.0.0:5000"
 
-# import views
 from . import chat_views, auth_views, user_views
 

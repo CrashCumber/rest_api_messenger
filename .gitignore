@@ -8,5 +8,7 @@ db_connection/
 test_api/
 conftest.py
 .DS_Store/
+locustfile.py
+wait-for-it.sh
 
 

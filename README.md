@@ -1,3 +1,5 @@
+https://medium.com/better-programming/introduction-to-locust-an-open-source-load-testing-tool-in-python-2b2e89ea1ff
+
 When user has autorized or registered he gets a token that he must provides in each request to server.
 
 ## Authorization 

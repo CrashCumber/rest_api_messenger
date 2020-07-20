@@ -35,7 +35,7 @@ def post_chats():
     """
     Create chat
     """
-    form = ChatForm(csrf_enabled=False)
+    form = ChatForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'
@@ -134,7 +134,7 @@ def post_chat(chat_id: int):
         response = make_response({"error": error_msg}, 403)
         return response
 
-    form = MessageForm(csrf_enabled=False)
+    form = MessageForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'

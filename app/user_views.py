@@ -35,7 +35,7 @@ def put_user():
     """
     User is modified
     """
-    form = UserForm(csrf_enabled=False)
+    form = UserForm()
 
     user_id = request.cookies.get('user_id')
     user = User.query.get(user_id)
@@ -81,7 +81,7 @@ def post_user():
     """
     User is created and authorized
     """
-    form = RegForm(csrf_enabled=False)
+    form = RegForm()
 
     if request.content_type != 'application/x-www-form-urlencoded':
         error_msg = 'Invalid content type'
