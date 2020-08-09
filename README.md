@@ -65,3 +65,79 @@ After these commands folder`migrations` will be created. It includes database  m
 ##### App is accessed on http://0.0.0.0:5000/
 
 
+## Setting nginx + uwsqi 
+
+#### Set nginx
+
+- Download nginx  
+`brew install nginx`
+
+- Create sites-available and sites-enabled directories  
+`mkdir /usr/local/etc/nginx/sites-available`
+`mkdir /usr/local/etc/nginx/sites-enabled`
+
+- Create app.conf file in sites-available  
+
+```shell script
+cd /usr/local/etc/nginx/sites-available
+vi app.conf
+```
+
+```bash
+server {
+    listen 8000; # port with our app
+    server_name app; # host with our app
+
+     location / {
+         include uwsgi_params;
+         uwsgi_pass unix:/Users/mac/Desktop/messenger/flask-uwsgi.sock; # path to your app directory (your can create socker in every directory, but it is better to do it in app directory)
+    }                                                                   # socket file will be created autimatically 
+
+     location /static {
+         root /Users/mac/Desktop/messenger; # path to your static directory 
+     }                                          
+}
+```        
+
+- Connect app.conf to nginx.conf file
+
+`vi /usr/local/etc/nginx/nginx.conf`
+
+add two string in nginx.conf
+
+```bash
+...
+http {
+
+    include /etc/nginx/conf.d/*.conf;                   #
+    include /usr/local/etc/nginx/sites-enabled/*.conf;  # path to sites-enabled dir
+...
+```
+
+to check conf run `nginx -t`
+
+- Create symbolic link
+
+`ln -s /usr/local/etc/nginx/sites-available/app.conf /usr/local/etc/nginx/sites-enabled`
+
+- Start and reload nginx
+
+```shell script
+nginx
+nginx -s reload
+```
+
+#### Set uwsqi
+1. Install uwsqi in our app directory( in virtual env)
+`pip install uwsqi `
+2. Create ini file uwsgi and change it for you preference 
+3. Run uwsgi
+` uwsgi uwsgi.ini`
+
+#### Your app available on server_name:8000 (app:8000 for my conf from nginx)
+
+https://medium.com/@ekwinder/setting-up-uwsgi-with-nginx-on-macos-for-python-web-apps-25edf4edab19
+
+https://medium.com/faun/deploy-flask-app-with-nginx-using-gunicorn-7fda4f50066a
+
+https://www.digitalocean.com/community/tutorials/how-to-serve-flask-applications-with-uswgi-and-nginx-on-ubuntu-18-04-ru
