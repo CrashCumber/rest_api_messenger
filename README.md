@@ -94,12 +94,12 @@ server {
 
      location /static {
          root /Users/mac/Desktop/messenger; # path to your static directory 
-     }
+     }                                          
 }
 ```
 to check conf run `nginx -t`
 
-4. Create simbolik link
+4. Create symbolic link
 
 `ln -s /usr/local/etc/nginx/sites-available/app.conf /usr/local/etc/nginx/sites-enabled`
 
