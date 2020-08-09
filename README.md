@@ -66,23 +66,24 @@ After these commands folder`migrations` will be created. It includes database  m
 
 
 ## Setting nginx + uwsqi 
+
 #### Set nginx
 
-1. Download nginx   
+- Download nginx  
 `brew install nginx`
 
-2. Create sites-available and sites-enabled directories   
+- Create sites-available and sites-enabled directories  
 `mkdir /usr/local/etc/nginx/sites-available`
 `mkdir /usr/local/etc/nginx/sites-enabled`
 
-3. Create app.conf file in sites-available
+- Create app.conf file in sites-available  
 
 ```shell script
 cd /usr/local/etc/nginx/sites-available
 vi app.conf
 ```
 
-```
+```bash
 server {
     listen 8000; # port with our app
     server_name app; # host with our app
@@ -96,19 +97,36 @@ server {
          root /Users/mac/Desktop/messenger; # path to your static directory 
      }                                          
 }
+```        
+
+- Connect app.conf to nginx.conf file
+
+`vi /usr/local/etc/nginx/nginx.conf`
+
+add two string in nginx.conf
+
+```bash
+...
+http {
+
+    include /etc/nginx/conf.d/*.conf;                   #
+    include /usr/local/etc/nginx/sites-enabled/*.conf;  # path to sites-enabled dir
+...
 ```
+
 to check conf run `nginx -t`
 
-4. Create symbolic link
+- Create symbolic link
 
 `ln -s /usr/local/etc/nginx/sites-available/app.conf /usr/local/etc/nginx/sites-enabled`
 
-5. Start and reload nginx
+- Start and reload nginx
 
 ```shell script
 nginx
 nginx -s reload
 ```
+
 #### Set uwsqi
 1. Install uwsqi in our app directory( in virtual env)
 `pip install uwsqi `
